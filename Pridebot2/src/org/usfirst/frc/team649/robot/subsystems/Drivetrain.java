@@ -47,6 +47,7 @@ public class Drivetrain extends Subsystem {
 	public void shift(Boolean highGear){
 		driveSol.set(highGear ? DoubleSolenoid.Value.kReverse : DoubleSolenoid.Value.kForward);
 	}
+	
 
     public void rawDrive(double left, double right) {
         motors[0].set(powerRatio * right);

@@ -2,7 +2,6 @@ package org.usfirst.frc.team649.robot;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.Button;
-import org.usfirst.frc.team649.robot.commands.ExampleCommand;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -22,8 +21,8 @@ public class OI {
 
 		public double getForward() {
 			// TODO Auto-generated method stub
-			if(operatorJoystick.getRawAxis(2) >= 0.05 || operatorJoystick.getRawAxis(2) <= -0.05){
-				return -operatorJoystick.getRawAxis(2);
+			if(operatorJoystick.getRawAxis(1) >= 0.05 || operatorJoystick.getRawAxis(1) <= -0.05){
+				return operatorJoystick.getRawAxis(1);
 			}else{
 				return 0.0;
 			}
@@ -36,32 +35,62 @@ public class OI {
 				return 0.0;
 			}
 		}
-		public Boolean getShot() {
+		public Boolean getTopShot() {
+			return operatorJoystick.getRawButton(4);
+		}
+		
+		public Boolean getRightShot() {
 			return operatorJoystick.getRawButton(2);
 		}
-		public Boolean shiftUp(){
+		
+		public Boolean getLeftShot() {
 			return operatorJoystick.getRawButton(3);
 		}
-		public Boolean shiftDown(){
+		
+//		public Boolean shiftUp(){
+//			return operatorJoystick.getRawButton(3);
+//		}
+//		public Boolean shiftDown(){
+//			return operatorJoystick.getRawButton(1);
+//		}
+		public boolean getSafety() {
+			if (operatorJoystick.getRawButton(5) && operatorJoystick.getRawButton(6)) {
+				return true;
+			}
+			return false;
+		}
+		
+		public boolean compressor() {
 			return operatorJoystick.getRawButton(1);
 		}
+		public boolean isShift(){
+			return operatorJoystick.getRawAxis(2) > 0.7 || operatorJoystick.getRawAxis(3) > 0.7;
+		}
+		
 		public double liftArm() {
 			//  6 = left 7 = right
-			if (operatorJoystick.getRawAxis(2) >= operatorJoystick.getRawAxis(3) ){
-				if(operatorJoystick.getRawAxis(2) >= 0.05){
-					System.out.println("Down");
-					return -operatorJoystick.getRawAxis(2);
-				}else {
-					return 0.0;
-				}
-			}else{
-				if(operatorJoystick.getRawAxis(3) >= 0.05){
-					System.out.println("Up");
-					return operatorJoystick.getRawAxis(3);
-				}else {
-					return 0.0;
-				}
+			if(operatorJoystick.getPOV() == 0) {
+				return 0.25;
 			}
+			else if (operatorJoystick.getPOV() == 180) {
+				return -0.25;
+			}
+			return 0;
+//			if (operatorJoystick.getRawAxis(2) >= operatorJoystick.getRawAxis(3) ){
+//				if(operatorJoystick.getRawAxis(2) >= 0.05){
+//					System.out.println("Down");
+//					return -operatorJoystick.getRawAxis(2);
+//				}else {
+//					return 0.0;
+//				}
+//			}else{
+//				if(operatorJoystick.getRawAxis(3) >= 0.05){
+//					System.out.println("Up");
+//					return operatorJoystick.getRawAxis(3);
+//				}else {
+//					return 0.0;
+//				}
+//			}
 		}
 	}
     //// CREATING BUTTONS

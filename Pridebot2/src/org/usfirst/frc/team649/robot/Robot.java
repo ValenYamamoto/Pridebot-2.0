@@ -2,12 +2,15 @@
 package org.usfirst.frc.team649.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 
-import org.usfirst.frc.team649.robot.commands.CannonFire;
-import org.usfirst.frc.team649.robot.commands.ExampleCommand;
+import org.usfirst.frc.team649.robot.commands.LeftCannonFire;
+import org.usfirst.frc.team649.robot.commands.RightCannonFire;
+import org.usfirst.frc.team649.robot.commands.RunCompressor;
+import org.usfirst.frc.team649.robot.commands.TopCannonFire;
 import org.usfirst.frc.team649.robot.subsystems.CannonArm;
 import org.usfirst.frc.team649.robot.subsystems.CannonShot;
 import org.usfirst.frc.team649.robot.subsystems.Drivetrain;
@@ -27,7 +30,10 @@ public class Robot extends IterativeRobot {
 	public static Drivetrain drive;
 	public static CannonArm cannon;
 	public static CannonShot cannonShot;
-	CannonFire cannonFire;
+	public static boolean compressor_prev_state = false;
+	public static boolean testState = false;
+	public Timer timer, topTimer, leftTimer, rightTimer;
+	TopCannonFire cannonFire;
 	OI oi;
 
 	
@@ -43,6 +49,10 @@ public class Robot extends IterativeRobot {
 		drive = new Drivetrain();
     	cannon = new CannonArm();
     	cannonShot = new CannonShot();
+    	timer = new Timer();
+    	topTimer = new Timer();
+    	leftTimer = new Timer();
+    	rightTimer = new Timer();
     }
 	
 	/**
@@ -98,23 +108,83 @@ public class Robot extends IterativeRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) autonomousCommand.cancel();
+        timer.start();
+        topTimer.start();
+        leftTimer.start();
+        rightTimer.start();
     }
 
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-    	if(oi.driver.getShot()) {
+    	Scheduler.getInstance().run();
+    	
+    	if (testState) {
+    		if(oi.driver.getSafety()) {
+    			if(oi.driver.getTopShot()) {
+    				cannonShot.fireStuffTop(true);
+    			} else {
+    				cannonShot.fireStuffTop(false);
+    			}
+    			if(oi.driver.getLeftShot()) {
+    				cannonShot.fireStuffLeft(true);
+    			} else {
+    				cannonShot.fireStuffLeft(false);
+    			}
+    			if(oi.driver.getRightShot()) {
+    				cannonShot.fireStuffRight(true);
+    			} else {
+    				cannonShot.fireStuffRight(false);
+    			}
+    		}
     		
+    	} else  {
+    		if(oi.driver.getSafety()) {
+    			if(oi.driver.getTopShot() && topTimer.get() > 0.5) {
+    				new TopCannonFire().start();
+    				SmartDashboard.putBoolean("Top", true);
+    				topTimer.reset();
+    			}
+    			if(oi.driver.getRightShot() && rightTimer.get() > 0.5) {
+    				new RightCannonFire().start();
+    				SmartDashboard.putBoolean("Right", true);
+    				rightTimer.reset();
+    			}
+    			if(oi.driver.getLeftShot() && leftTimer.get() > 0.5) {
+    				new LeftCannonFire().start();
+    				SmartDashboard.putBoolean("Left", true);
+    				leftTimer.reset();
+    			}
+    		}
     	}
-    	if(oi.driver.shiftDown()){
+    
+    	if (oi.driver.compressor()) {
+    		if (timer.get() > 0.5) {
+    			new RunCompressor().start();
+    			timer.reset();
+    		}
+    	}
+    	if (oi.driver.isShift()){
+    		drive.shift(true);
+    	}else{
     		drive.shift(false);
     	}
-    	if(oi.driver.shiftUp()) {
-    		drive.shift(true);
-    	}
+//    	if(oi.driver.shiftDown()){
+//    		drive.shift(false);
+//    	}
+//    	if(oi.driver.shiftUp()) {
+//    		drive.shift(true);
+//    	}
     	drive.driveFwdRot(oi.driver.getForward(), oi.driver.getRotation());
     	cannon.liftCannon(oi.driver.liftArm());
+    	
+    	SmartDashboard.putBoolean("Get Safety", oi.driver.getSafety());
+    	SmartDashboard.putBoolean("Get Right", oi.driver.getRightShot());
+    	SmartDashboard.putBoolean("Get left", oi.driver.getLeftShot());
+    	SmartDashboard.putBoolean("Get top", oi.driver.getTopShot());
+    	SmartDashboard.putBoolean("Compressor", oi.driver.compressor());
+    	SmartDashboard.putNumber("Lift Arm", oi.driver.liftArm());
     }
     
     /**

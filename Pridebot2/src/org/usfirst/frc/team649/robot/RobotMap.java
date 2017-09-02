@@ -16,7 +16,10 @@ public class RobotMap {
 		public static final int[] MOTOR_PORTS = { 9, 8, 7, 6 };
 		public static final int[] DRIVE_SOL = {4,5};
 		public static final int COMPRESS_LIMIT_CAN = 9;
-		public static final int SPIKE_PORT = 0;
+		public static final int SPIKE_RIGHT_PORT = 1; //right
+		public static final int SPIKE_TOP_PORT = 2; // middle
+		public static final int SPIKE_LEFT_PORT = 3; // left
+		public static final int SPIKE_COMPRESSOR_PORT = 0;
 	}
 	
 	public static class CannonArm {

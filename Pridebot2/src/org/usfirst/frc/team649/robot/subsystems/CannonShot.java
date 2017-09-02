@@ -13,12 +13,15 @@ public class CannonShot extends Subsystem {
     
     // Put methods for controlling this subsystem
     // here. Call these from Commands.
-	public Relay spike;
+	public Relay spikeTop, spikeLeft, spikeRight, compressorSpike;
 	public Compressor compressorCAN;
 	
 	
 	public CannonShot() {
-		spike = new Relay(RobotMap.Drivetrain.SPIKE_PORT);
+		spikeTop = new Relay(RobotMap.Drivetrain.SPIKE_TOP_PORT);
+		spikeLeft = new Relay(RobotMap.Drivetrain.SPIKE_LEFT_PORT);
+		spikeRight = new Relay(RobotMap.Drivetrain.SPIKE_RIGHT_PORT);
+		compressorSpike = new Relay(RobotMap.Drivetrain.SPIKE_COMPRESSOR_PORT);
 		compressorCAN = new Compressor(RobotMap.Drivetrain.COMPRESS_LIMIT_CAN);
 	}
     public void initDefaultCommand() {
@@ -26,19 +29,57 @@ public class CannonShot extends Subsystem {
         //setDefaultCommand(new MySpecialCommand());
     }
     
-    public void compressorSwitch() {
-    	if (compressorCAN.getPressureSwitchValue()) {
-    		spike.set(Relay.Value.kOff);
+    public void compressorSwitch(boolean on) {
+    	if (on) {
+    		compressorSpike.set(Relay.Value.kForward);
     	} else {
-    		spike.set(Relay.Value.kOn);
+    		compressorSpike.set(Relay.Value.kOff);
     	}
     }
-    public void fireStuff(boolean ready) {
+    public void fireStuffTop(boolean ready) {
     	if (ready) {
-    		spike.set(Relay.Value.kOn);
+    		spikeTop.set(Relay.Value.kForward);
     	} else {
-    		spike.set(Relay.Value.kOff);
+    		spikeTop.set(Relay.Value.kOff);
     	}
     }
+    
+    public void fireStuffRight(boolean ready) {
+    	if (ready) {
+    		spikeRight.set(Relay.Value.kForward);
+    	} else {
+    		spikeRight.set(Relay.Value.kOff);
+    	}
+    }
+    
+    public void fireStuffLeft(boolean ready) {
+    	if (ready) {
+    		spikeLeft.set(Relay.Value.kForward);
+    	} else {
+    		spikeLeft.set(Relay.Value.kOff);
+    	}
+    }
+    
+    public boolean checkFireStateTop() {
+    	if (spikeTop.get() == Relay.Value.kForward) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    public boolean checkFireStateLeft() {
+    	if (spikeLeft.get() == Relay.Value.kForward) {
+    		return true;
+    	}
+    	return false;
+    }
+
+    public boolean checkFireStateRight() {
+    	if (spikeRight.get() == Relay.Value.kForward) {
+    		return true;
+    	}
+    	return false;
+    }
+
 }
 
